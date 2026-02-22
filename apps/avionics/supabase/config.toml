@@ -1,0 +1,4 @@
+project_id = "nybmmlxdetjmcvdeyvlh"
+
+[functions.aviation-weather]
+verify_jwt = false

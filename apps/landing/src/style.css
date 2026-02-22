@@ -1,0 +1,123 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: hsl(220, 20%, 8%);
+  --bg-card: hsl(220, 18%, 12%);
+  --bg-card-hover: hsl(220, 18%, 15%);
+  --text: hsl(0, 0%, 92%);
+  --text-muted: hsl(220, 10%, 55%);
+  --cyan: hsl(185, 100%, 55%);
+  --green: hsl(160, 100%, 45%);
+  --magenta: hsl(300, 80%, 60%);
+  --border: hsl(220, 15%, 22%);
+  --font-mono: "Share Tech Mono", monospace;
+  --font-body: "Exo 2", sans-serif;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+header {
+  text-align: center;
+  padding: 4rem 1rem 2rem;
+}
+
+header h1 {
+  font-family: var(--font-mono);
+  font-size: 2.5rem;
+  letter-spacing: 0.08em;
+  color: var(--cyan);
+}
+
+header p {
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  font-size: 1.05rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  max-width: 720px;
+  width: 100%;
+  padding: 1rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 2rem 1.5rem;
+  text-decoration: none;
+  color: var(--text);
+  transition: background 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--cyan);
+}
+
+.card h2 {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  color: var(--green);
+}
+
+.card p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.card .badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.25rem;
+  width: fit-content;
+}
+
+.badge--live {
+  background: hsla(160, 100%, 45%, 0.15);
+  color: var(--green);
+  border: 1px solid hsla(160, 100%, 45%, 0.3);
+}
+
+.badge--soon {
+  background: hsla(300, 80%, 60%, 0.1);
+  color: var(--magenta);
+  border: 1px solid hsla(300, 80%, 60%, 0.2);
+}
+
+footer {
+  margin-top: auto;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+}
