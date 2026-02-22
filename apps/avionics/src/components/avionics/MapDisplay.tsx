@@ -221,6 +221,7 @@ export const MapDisplay = () => {
   const procLayers = useRef<L.LayerGroup | null>(null);
   const rangeLayers = useRef<L.LayerGroup | null>(null);
   const terrainLayer = useRef<L.GridLayer | null>(null);
+  const baseTileLayer = useRef<L.TileLayer | null>(null);
   const { flightPlan, activeWaypointIndex, registerMapZoom } = useGtn();
   const { flight, connectionMode } = useFlightData();
   const isLive = connectionMode !== "none";
@@ -299,13 +300,23 @@ export const MapDisplay = () => {
     const map = L.map(mapRef.current, {
       center: [flight.lat, flight.lng],
       zoom: 7,
+      minZoom: 3,
       zoomControl: false,
       attributionControl: false,
+      worldCopyJump: true,
+      zoomAnimation: true,
+      zoomAnimationThreshold: 4,
+      fadeAnimation: true,
+      markerZoomAnimation: true,
     });
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      maxZoom: 19,
-    }).addTo(map);
+    const isDark = !document.documentElement.classList.contains("light");
+    baseTileLayer.current = L.tileLayer(
+      isDark
+        ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+      { maxZoom: 19, noWrap: false }
+    ).addTo(map);
 
     // Flight plan route polyline (magenta)
     const routeCoords = flightPlan.map((wp) => [wp.lat, wp.lng] as L.LatLngTuple);
@@ -362,12 +373,30 @@ export const MapDisplay = () => {
 
     // Register zoom controls with GtnContext
     registerMapZoom(
-      () => map.zoomIn(),
-      () => map.zoomOut(),
+      () => map.zoomIn(1, { animate: true }),
+      () => map.zoomOut(1, { animate: true }),
     );
 
-    return () => { map.remove(); mapInstance.current = null; aircraftMarker.current = null; nexradLayer.current = null; metarMarkers.current = null; airwayLayers.current = null; procLayers.current = null; rangeLayers.current = null; terrainLayer.current = null; };
+    return () => { map.remove(); mapInstance.current = null; aircraftMarker.current = null; nexradLayer.current = null; metarMarkers.current = null; airwayLayers.current = null; procLayers.current = null; rangeLayers.current = null; terrainLayer.current = null; baseTileLayer.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Sync base tile layer with display mode
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      if (!mapInstance.current || !baseTileLayer.current) return;
+      const root = document.documentElement;
+      const isLight = root.classList.contains("light");
+      const isHighContrast = root.classList.contains("high-contrast");
+      const newUrl = isLight
+        ? "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        : isHighContrast
+        ? "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+        : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+      baseTileLayer.current.setUrl(newUrl);
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
   }, []);
 
   // Toggle NEXRAD layer
@@ -690,11 +719,11 @@ export const MapDisplay = () => {
   }, [flight.lat, flight.lng, flight.heading, isLive]);
 
   return (
-    <div className="flex-1 relative overflow-hidden">
-      <div ref={mapRef} className="absolute inset-0" />
+    <div className="flex-1 relative overflow-hidden bg-avionics-panel-dark">
+      <div ref={mapRef} className="absolute inset-0" style={{ background: "hsl(220, 20%, 8%)" }} />
 
       {/* Connection status overlay */}
-      <div className="absolute top-2 left-2 z-[1000] flex items-center gap-1.5">
+      <div className="absolute top-2 left-2 z-[1000] flex items-center gap-1.5" onMouseDown={e => e.stopPropagation()} onClick={e => e.stopPropagation()}>
         <div className={`w-1.5 h-1.5 rounded-full ${isLive ? "bg-avionics-green animate-pulse" : "bg-avionics-divider"}`} />
         <span className="font-mono text-[9px] text-avionics-label bg-avionics-panel-dark/80 px-1.5 py-0.5 rounded">
           {connectionMode === "test" ? "TEST" : connectionMode === "flowpro" ? "FLOW PRO" : connectionMode === "websocket" ? "WS BRIDGE" : "STATIC"}
@@ -702,7 +731,7 @@ export const MapDisplay = () => {
       </div>
 
       {/* Map overlay toggles */}
-      <div className="absolute top-2 right-2 z-[1000] flex flex-col items-end gap-1">
+      <div className="absolute top-2 right-2 z-[1000] flex flex-col items-end gap-1" onMouseDown={e => e.stopPropagation()} onClick={e => e.stopPropagation()} onDoubleClick={e => e.stopPropagation()}>
         <div className="flex gap-1">
           <button
             onClick={() => setNexradOn(!nexradOn)}
@@ -833,7 +862,7 @@ export const MapDisplay = () => {
       </div>
 
       {/* Range indicator */}
-      <div className="absolute bottom-2 left-2 z-[1000] font-mono text-[9px] text-avionics-label bg-avionics-panel-dark/80 px-1.5 py-0.5 rounded">
+      <div className="absolute bottom-2 left-2 z-[1000] font-mono text-[9px] text-avionics-label bg-avionics-panel-dark/80 px-1.5 py-0.5 rounded" onMouseDown={e => e.stopPropagation()} onClick={e => e.stopPropagation()}>
         20 NM
       </div>
     </div>

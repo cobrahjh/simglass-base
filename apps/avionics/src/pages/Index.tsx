@@ -98,7 +98,7 @@ const GtnDisplay = () => {
   };
 
   return (
-    <div className="w-full max-w-md rounded-xl overflow-hidden avionics-bezel border-2 border-avionics-divider bg-avionics-panel-dark flex flex-col" style={{ height: "min(85vh, 680px)" }}>
+    <div className="w-full max-w-md rounded-xl overflow-hidden border-2 border-avionics-divider bg-avionics-panel-dark flex flex-col" style={{ height: "min(85vh, 680px)" }}>
       {/* Header */}
       <div className={`border-b border-avionics-divider px-3 py-1 flex items-center justify-between ${smartGlideActive ? "bg-destructive/20" : "bg-avionics-panel"}`}>
         <span className="font-body text-[13px] text-avionics-label tracking-[0.3em] uppercase font-semibold">
